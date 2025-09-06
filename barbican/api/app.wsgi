@@ -22,5 +22,11 @@ exposed as an entrypoint via barbican-wsgi-api
 """
 
 from barbican.api import app
+import os
+
+if os.environ.get("DEBUGPY_ENABLE", "false").lower() == "true":
+    import debugpy
+    debugpy.listen(("0.0.0.0", int(os.environ.get("DEBUGPY_PORT", "5678"))))
+    debugpy.wait_for_client()
 
 application = app.get_api_wsgi_script()
