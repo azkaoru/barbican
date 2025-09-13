@@ -24,7 +24,10 @@ exposed as an entrypoint via barbican-wsgi-api
 from barbican.api import app
 import os
 
+print('hello barbican')
+
 if os.environ.get("DEBUGPY_ENABLE", "false").lower() == "true":
+    print('enable debugpy')
     import debugpy
     debugpy.listen(("0.0.0.0", int(os.environ.get("DEBUGPY_PORT", "5678"))))
     debugpy.wait_for_client()
