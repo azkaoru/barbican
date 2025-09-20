@@ -29,7 +29,10 @@ print('hello barbican')
 if os.environ.get("DEBUGPY_ENABLE", "false").lower() == "true":
     print('enable debugpy')
     import debugpy
+    print('debugpy listen before')
     debugpy.listen(("0.0.0.0", int(os.environ.get("DEBUGPY_PORT", "5678"))))
+    print('debugpy wait_for_client before')
     debugpy.wait_for_client()
+    print('debugpy wait_for_client after')
 
 application = app.get_api_wsgi_script()
