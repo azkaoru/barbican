@@ -114,6 +114,18 @@ def create_version_app(global_config, **local_conf):
 
 
 def get_api_wsgi_script():
+    print('hello barbican-manage')
+    import os
+    if os.environ.get("DEBUGPY_ENABLE_API", "false").lower() == "true":
+        print('enable debugpy')
+        import debugpy
+        print('debugpy listen before')
+        debugpy.listen(("0.0.0.0", int(os.environ.get("DEBUGPY_PORT", "5678"))))
+        print('debugpy listen after')
+        print('debugpy wait_for_client before')
+        debugpy.wait_for_client()
+        print('debugpy wait_for_client after')
+
     conf = '/etc/barbican/barbican-api-paste.ini'
     application = deploy.loadapp('config:%s' % conf)
     return application

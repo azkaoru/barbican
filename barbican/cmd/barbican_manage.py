@@ -436,7 +436,7 @@ category_opt = cfg.SubCommandOpt('category',
 def main():
     print('hello barbican-manage')
     import os
-    if os.environ.get("DEBUGPY_ENABLE", "false").lower() == "true":
+    if os.environ.get("DEBUGPY_ENABLE_CMD", "false").lower() == "true":
         print('enable debugpy')
         import debugpy
         print('debugpy listen before')
