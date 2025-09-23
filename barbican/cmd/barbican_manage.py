@@ -312,6 +312,7 @@ class HSMCommands(object):
     @args('--dry-run', action="store_true", dest='dryrun', default=False,
           help='Displays changes that will be made (Non-destructive)')
     def rewrap_pkek(self, conf, dryrun=None):
+
         rewrapper = pkcs11_rewrap.KekRewrap(pkcs11_rewrap.CONF)
         rewrapper.execute(dryrun)
         rewrapper.pkcs11.return_session(rewrapper.hsm_session)
@@ -433,6 +434,18 @@ category_opt = cfg.SubCommandOpt('category',
 
 
 def main():
+    print('hello barbican-manage')
+    import os
+    if os.environ.get("DEBUGPY_ENABLE", "false").lower() == "true":
+        print('enable debugpy')
+        import debugpy
+        print('debugpy listen before')
+        debugpy.listen(("0.0.0.0", int(os.environ.get("DEBUGPY_PORT", "5678"))))
+        print('debugpy listen after')
+        print('debugpy wait_for_client before')
+        debugpy.wait_for_client()
+        print('debugpy wait_for_client after')
+
     """Parse options and call the appropriate class/method."""
     CONF = config.new_config()
     CONF.register_cli_opt(category_opt)
@@ -469,6 +482,7 @@ def main():
         return fn(CONF, *fn_args, **fn_kwargs)
     except Exception as e:
         sys.exit("ERROR: %s" % e)
+
 
 
 if __name__ == '__main__':
