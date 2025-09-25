@@ -442,9 +442,9 @@ def main():
         print('debugpy listen before')
         debugpy.listen(("0.0.0.0", int(os.environ.get("DEBUGPY_PORT", "5678"))))
         print('debugpy listen after')
-        # print('debugpy wait_for_client before')
-        # debugpy.wait_for_client()
-        # print('debugpy wait_for_client after')
+        print('debugpy wait_for_client before')
+        debugpy.wait_for_client()
+        print('debugpy wait_for_client after')
 
     """Parse options and call the appropriate class/method."""
     CONF = config.new_config()
