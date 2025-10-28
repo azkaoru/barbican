@@ -84,21 +84,28 @@ class KekRewrap(kek_rewrap.BaseKEKRewrap):
                 session
             )
             # Decode data
-            iv = base64.b64decode(meta_dict['iv'])
             wrapped_key = base64.b64decode(meta_dict['wrapped_key'])
             hmac = base64.b64decode(meta_dict['hmac'])
+            print(meta_dict)
+            if meta_dict['iv'] != None:
+                iv = base64.b64decode(meta_dict['iv'])
+                kek_data = iv + wrapped_key
+            else:
+                iv = None
+                kek_data = wrapped_key
             # Verify HMAC
-            kek_data = iv + wrapped_key
             self.pkcs11.verify_hmac(kek_mkhk, hmac, kek_data, session)
             # Unwrap KEK
-            current_kek = self.pkcs11.unwrap_key(kek_mkek, iv, wrapped_key,
-                                                 session)
+            current_kek = self.pkcs11.unwrap_key(meta_dict['key_wrap_mechanism'], kek_mkek, iv, wrapped_key, session)
 
             # Wrap KEK with new master keys
             new_kek = self.pkcs11.wrap_key(self.new_mkek, current_kek,
                                            session)
             # Compute HMAC for rewrapped KEK
-            new_kek_data = new_kek['iv'] + new_kek['wrapped_key']
+            if new_kek['iv'] != None:
+                new_kek_data = new_kek['iv'] + new_kek['wrapped_key']
+            else:
+                new_kek_data = new_kek['wrapped_key']
             new_hmac = self.pkcs11.compute_hmac(self.new_mkhk, new_kek_data,
                                                 session)
             # Destroy unwrapped KEK
@@ -108,7 +115,10 @@ class KekRewrap(kek_rewrap.BaseKEKRewrap):
             updated_meta = meta_dict.copy()
             updated_meta['mkek_label'] = self.new_mkek_label
             updated_meta['hmac_label'] = self.new_hmac_label
-            updated_meta['iv'] = base64.b64encode(new_kek['iv'])
+            if new_kek['iv'] != None:
+                updated_meta['iv'] = base64.b64encode(new_kek['iv'])
+            else:
+                updated_meta['iv'] = None
             updated_meta['wrapped_key'] = base64.b64encode(
                 new_kek['wrapped_key'])
             updated_meta['hmac'] = base64.b64encode(new_hmac)
