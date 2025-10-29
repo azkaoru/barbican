@@ -110,6 +110,12 @@ class TestKekRewrap(unittest.TestCase):
 
     def test_rewrap_kek_iv_none(self):
         """Test rewrap_kek functionality when IV is None."""
+        # Override wrap_key to return None for iv when key_wrap_generate_iv is false
+        self.pkcs11.wrap_key.return_value = {
+            "iv": None,
+            "wrapped_key": b"new_wrapped_key",
+        }
+
         # Mock kek object
         kek = mock.MagicMock()
         kek.plugin_meta = json.dumps(
@@ -151,9 +157,7 @@ class TestKekRewrap(unittest.TestCase):
         updated_meta = json.loads(kek.plugin_meta)
         self.assertEqual(updated_meta["mkek_label"], "new_mkek_label")
         self.assertEqual(updated_meta["hmac_label"], "new_hmac_label")
-        self.assertEqual(
-            updated_meta["iv"], base64.b64encode(b"new_iv").decode()
-        )  # New IV is generated even if old was None
+        self.assertIsNone(updated_meta["iv"])  # IV remains None when key_wrap_generate_iv is false
         self.assertEqual(
             updated_meta["wrapped_key"],
             base64.b64encode(b"new_wrapped_key").decode()
